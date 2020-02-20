@@ -82,7 +82,7 @@ eps = 0.5
 ######################################################################
 # Particle creation rouintes
 def get_projectile_particles():
-    x, y, z = numpy.mgrid[-0.001:0.001 + dx:dx, -0.005+dx/2:0.005+dx/2 + dx:dx, -0.005+dx/2:0.005+dx/2 + dx:dx]
+    x, y, z = numpy.mgrid[-0.001:0.001 + dx:dx, -0.005+dx/4:0.005+dx/4 + dx:dx, -0.005+dx/4:0.005+dx/4 + dx:dx]
     x = x.ravel()
     y = y.ravel()
     z = z.ravel()
@@ -93,7 +93,7 @@ def get_projectile_particles():
     y = y[keep]
     z = z[keep]
 
-    x = x - 0.004
+    x = x - 0.002
 
     print('%d Projectile particles' % len(x))
 
@@ -141,6 +141,13 @@ def get_plate_particles():
     x = x.ravel()
     y = y.ravel()
     z = z.ravel()
+
+    d = (z * z + y * y)
+    keep = numpy.flatnonzero(d <= 0.02 * 0.02)
+
+    x = x[keep]
+    y = y[keep]
+    z = z[keep]
 
     print('%d Target particles' % len(x))
 
@@ -199,10 +206,11 @@ class Impact(Application):
 
         integrator = EPECIntegrator(projectile=SolidMechStep(), plate=SolidMechStep())
 
-        dt = 1e-9
-        tf = 3e-7
+        dt = 5e-10
+        tf = 40e-7
         solver = Solver(kernel=kernel, dim=dim, integrator=integrator, dt=dt, tf=tf,
-                        output_at_times=numpy.mgrid[1e-8:25e-8:1e-8])
+                        output_at_times=numpy.mgrid[0:40e-7:1e-7])
+
         return solver
 
     def create_equations(self):
